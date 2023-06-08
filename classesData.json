@@ -1,0 +1,82 @@
+[
+    {
+      "title": "Guitar Basics Workshop",
+      "instructor": "John Smith",
+      "description": "Join our Guitar Basics Workshop and learn the fundamentals of playing the guitar. From chords and strumming techniques to playing popular songs, this workshop is perfect for beginners looking to start their guitar journey.",
+      "capacity": 30,
+      "enrolledStudents": 22,
+      "availableSeat": 8,
+      "price": 99.99,
+      "image": "https://i.ibb.co/3R7JNqb/guiter.jpg"
+    },
+    {
+      "title": "Piano Masterclass",
+      "instructor": "Emily Johnson",
+      "description": "Join our Piano Masterclass and take your piano skills to the next level. Learn advanced techniques, music theory, and explore a wide range of repertoire. This class is suitable for intermediate to advanced piano players.",
+      "capacity": 20,
+      "enrolledStudents": 15,
+      "availableSeat": 5,
+      "price": 129.99,
+      "image": "https://i.ibb.co/wQdsJpn/piano.jpg"
+    },
+    {
+      "title": "Singing and Vocal Performance Workshop",
+      "instructor": "Sophia Lee",
+      "description": "Discover the power of your voice in our Singing and Vocal Performance Workshop. Learn vocal techniques, stage presence, and interpretation. Build confidence and showcase your talent in a final live performance.",
+      "capacity": 25,
+      "enrolledStudents": 18,
+      "availableSeat": 7,
+      "price": 89.99,
+      "image": "https://i.ibb.co/MgL12DT/vocal.jpg"
+    },
+    {
+      "title": "Drumming Essentials Class",
+      "instructor": "Michael Anderson",
+      "description": "Join our Drumming Essentials Class and learn the foundational techniques of drumming. Develop rhythm, coordination, and explore different drumming styles. No prior experience required.",
+      "capacity": 15,
+      "enrolledStudents": 12,
+      "availableSeat": 3,
+      "price": 79.99,
+      "image": "https://i.ibb.co/93QQpwq/drummer.jpg"
+    },
+    {
+      "title": "String Instruments Ensemble",
+      "instructor": "Olivia Davis",
+      "description": "Join our String Instruments Ensemble and experience the joy of playing in a group. Explore classical and contemporary repertoire while developing your ensemble skills. Open to violin, viola, cello, and double bass players.",
+      "capacity": 12,
+      "enrolledStudents": 10,
+      "availableSeat": 2,
+      "price": 109.99,
+      "image": "https://i.ibb.co/wQdsJpn/piano.jpg"
+    },
+    {
+      "title": "Songwriting Workshop",
+      "instructor": "David Williams",
+      "description": "Unleash your creativity in our Songwriting Workshop. Learn the art of crafting lyrics, composing melodies, and arranging your own songs. Develop your unique musical style and express yourself through music.",
+      "capacity": 18,
+      "enrolledStudents": 14,
+      "availableSeat": 4,
+      "price": 94.99,
+      "image": "https://i.ibb.co/MgL12DT/vocal.jpg"
+    },
+    {
+      "title": "Jazz Improvisation Class",
+      "instructor": "Michael Anderson",
+      "description": "Dive into the world of jazz improvisation in our Jazz Improvisation Class. Explore different scales, chords, and improvisation techniques. Enhance your ability to spontaneously create music in a jazz setting.",
+      "capacity": 20,
+      "enrolledStudents": 16,
+      "availableSeat": 4,
+      "price": 119.99,
+      "image": "https://i.ibb.co/3R7JNqb/guiter.jpg"
+    },
+    {
+      "title": "Music Production and Recording Workshop",
+      "instructor": "Sophia Lee",
+      "description": "Discover the world of music production and recording in our Workshop. Learn to use digital audio workstations, recording techniques, and mix your own music. Create professional-quality recordings and unleash your creativity.",
+      "capacity": 15,
+      "enrolledStudents": 11,
+      "availableSeat": 4,
+      "price": 139.99,
+      "image": "https://i.ibb.co/pr5wYr5/keyboard.jpg"
+    }
+  ]

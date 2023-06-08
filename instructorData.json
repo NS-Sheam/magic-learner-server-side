@@ -1,0 +1,75 @@
+[
+    {
+      "role": "instructor",
+      "isAdmin": true,
+      "name": "John Smith",
+      "email": "john@example.com",
+      "classesTaken": 5,
+      "classes": ["Guitar Basics", "Vocal Techniques"],
+      "image": "https://i.ibb.co/BGJDxZG/instructor-3.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": false,
+      "name": "Emily Johnson",
+      "email": "emilyjohnson@example.com",
+      "classesTaken": 3,
+      "classes": ["Piano Fundamentals", "Songwriting"],
+      "image": "https://i.ibb.co/YPrrHLV/instructor-4.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": true,
+      "name": "Michael Anderson",
+      "email": "michael@example.com",
+      "classesTaken": 8,
+      "classes": ["Drumming Essentials", "Rhythm and Beats"],
+      "image": "https://i.ibb.co/MDbJq5Z/instructor-1.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": false,
+      "name": "Sophia Lee",
+      "email": "sophialee@example.com",
+      "classesTaken": 4,
+      "classes": ["Violin Masterclass", "Music Theory"],
+      "image": "https://i.ibb.co/kGkbwTQ/instructor-2.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": false,
+      "name": "David Williams",
+      "email": "davidwilliams@example.com",
+      "classesTaken": 9,
+      "classes": ["Bass Guitar Techniques", "Jam Sessions"],
+      "image": "https://i.ibb.co/BGJDxZG/instructor-3.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": true,
+      "name": "Olivia Davis",
+      "email": "olivi@example.com",
+      "classesTaken": 5,
+      "classes": ["Singing Performance", "Stage Presence"],
+      "image": "https://i.ibb.co/YPrrHLV/instructor-4.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": false,
+      "name": "Emily Johnson",
+      "email": "emilyjohnson@example.com",
+      "classesTaken": 3,
+      "classes": ["Piano Fundamentals", "Songwriting"],
+      "image": "https://i.ibb.co/YPrrHLV/instructor-4.jpg"
+    },
+    {
+      "role": "instructor",
+      "isAdmin": false,
+      "name": "Michael Anderson",
+      "email": "michaelanderson@example.com",
+      "classesTaken": 4,
+      "classes": ["Drumming Essentials", "Rhythm and Beats"],
+      "image": "https://i.ibb.co/MDbJq5Z/instructor-1.jpg"
+    }
+  ]
+  
