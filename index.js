@@ -47,7 +47,8 @@ async function run() {
     })
     
     app.get("/classes", async (req, res) =>{
-      res.send(classesData);
+      const result = await classesCollection.find().toArray();
+      res.send(result);
     })
 
 
@@ -68,6 +69,32 @@ async function run() {
       res.send(result);
     })
     
+
+    app.post("/classes", async (req, res) =>{
+      const body = req.body;
+      // console.log(body);
+      const result = await classesCollection.insertOne(body);
+      console.log(result);
+      res.send(result);
+    })
+
+
+    // Update operation 
+    app.put("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      // console.log(body);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateUser = {
+          $set: {
+              ...body
+          },
+      };
+      const result = await usersCollection.updateOne(filter, updateUser, options);
+      // console.log(result);
+      res.send(result);
+  });
 
 
     // delete operations 
