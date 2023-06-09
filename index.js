@@ -35,18 +35,18 @@ async function run() {
     const classesCollection = client.db("summerCampDb").collection("classesData");
 
 
-    app.get("/users", async (req, res)=>{
+    app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
 
-    app.get("/users/instructors", async (req, res) =>{
-      const query = {role: "instructor"}
-      const result = await usersCollection.find(query).sort({classesTaken: -1}).toArray();
+    app.get("/users/instructors", async (req, res) => {
+      const query = { role: "instructor" }
+      const result = await usersCollection.find(query).sort({ classesTaken: -1 }).toArray();
       res.send(result)
     })
-    
-    app.get("/classes", async (req, res) =>{
+
+    app.get("/classes", async (req, res) => {
       const result = await classesCollection.find().toArray();
       res.send(result);
     })
@@ -59,48 +59,65 @@ async function run() {
       const user = await usersCollection.findOne(query);
       // const result = { isAdmin: user?.role === "admin" }
       // console.log(user);
-      res.send({"isAdmin": user.isAdmin, "role": user.role});
+      res.send({ "isAdmin": user.isAdmin, "role": user.role });
     })
 
 
-    app.post("/users", async(req, res) =>{
+    app.post("/users", async (req, res) => {
       const body = req.body;
       const result = await usersCollection.insertOne(body);
       res.send(result);
     })
-    
 
-    app.post("/classes", async (req, res) =>{
+
+    app.post("/classes", async (req, res) => {
       const body = req.body;
       // console.log(body);
       const result = await classesCollection.insertOne(body);
-      console.log(result);
+      // console.log(result);
       res.send(result);
     })
 
 
+    // app.put()
     // Update operation 
-    app.put("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const body = req.body;
-      // console.log(body);
-      const filter = { _id: new ObjectId(id) };
-      const options = { upsert: true };
-      const updateUser = {
+    app.put("/users", async (req, res) => {
+      let query = {};
+      if (req?.query?.email) {
+        query = req.query.email;
+        const body = req.body;
+        // console.log(query);
+        // console.log(body);
+        const filter = { email: query };
+        const options = { upsert: true };
+        if (body.status && body.classId) {
+          const user = await usersCollection.findOne(filter);
+          if (user?.classesId && user.classesId.includes(body.classId)) {
+            // ClassId already exists in the array
+            return res.send({ error: "ClassId already exists in the array." });
+          } else {
+            const update = { $addToSet: { classesId: body.classId } };
+            const result = await usersCollection.updateOne(filter, update, options);
+            return res.send(result);
+          }
+        }
+        const updateUser = {
           $set: {
-              ...body
+            ...body
           },
-      };
-      const result = await usersCollection.updateOne(filter, updateUser, options);
-      // console.log(result);
-      res.send(result);
-  });
+        };
+        const result = await usersCollection.updateOne(filter, updateUser, options);
+        // console.log(result);
+        res.send(result);
+
+      }
+    });
 
 
     // delete operations 
-    app.delete("/users/:id", async(req, res) =>{
+    app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id : new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
       res.send(result);
     })
