@@ -36,6 +36,13 @@ async function run() {
 
 
     app.get("/users", async (req, res) => {
+      if (req?.query?.email) {
+        const query = { email: req.query.email };
+        const user = await usersCollection.findOne(query);
+        const classIds = user?.classesId.map(id => new ObjectId(id)); // Convert string IDs to ObjectId
+        const classesData = await classesCollection.find({ _id: { $in: classIds } }).toArray();
+        res.send(classesData);
+      }
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
@@ -86,8 +93,8 @@ async function run() {
       if (req?.query?.email) {
         query = req.query.email;
         const body = req.body;
-        // console.log(query);
-        // console.log(body);
+        console.log(query);
+        console.log(body);
         const filter = { email: query };
         const options = { upsert: true };
         if (body.status && body.classId) {
