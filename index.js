@@ -47,8 +47,6 @@ async function run() {
         else if (!user?.classesId) {
           return res.send({ error: "No classes found" });
         } else {
-          // TODO: Enroll page server crashed after reloading
-          // Handle the scenario where the user with the provided email is not found
           return res.status(404).send({ error: "User not found" });
         }
       }
@@ -73,13 +71,17 @@ async function run() {
 
 
     app.get('/users/admin/:email', async (req, res) => {
-      const email = req.params?.email;
+      if (req.params?.email) {
+        const email = req.params?.email;
       // console.log(email);
       const query = { email: email }
       const user = await usersCollection.findOne(query);
       // const result = { isAdmin: user?.role === "admin" }
       // console.log(user);
       res.send({ "isAdmin": user.isAdmin, "role": user.role });
+      }else{
+        res.send({isAdmin: false, role: null})
+      }
     })
 
 
@@ -113,7 +115,7 @@ async function run() {
         const user = await usersCollection.findOne(filter);
         if (body?.classId) {
           if (user?.classesId && user?.classesId?.includes(body.classId)) {
-            // ClassId already exists in the array
+            // if ClassId already exists in the array
             return res.send({ error: "ClassId already exists in the array." });
           }
           else {
@@ -185,6 +187,16 @@ async function run() {
       const result = await usersCollection.deleteOne(query);
       res.send(result);
     })
+
+    // delete class operations
+    app.delete("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      // console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await classesCollection.deleteOne(query);
+      res.send(result);
+    })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
