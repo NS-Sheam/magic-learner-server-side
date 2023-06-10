@@ -73,14 +73,14 @@ async function run() {
     app.get('/users/admin/:email', async (req, res) => {
       if (req.params?.email) {
         const email = req.params?.email;
-      // console.log(email);
-      const query = { email: email }
-      const user = await usersCollection.findOne(query);
-      // const result = { isAdmin: user?.role === "admin" }
-      // console.log(user);
-      res.send({ "isAdmin": user.isAdmin, "role": user.role });
-      }else{
-        res.send({isAdmin: false, role: null})
+        // console.log(email);
+        const query = { email: email }
+        const user = await usersCollection.findOne(query);
+        // const result = { isAdmin: user?.role === "admin" }
+        // console.log(user);
+        res.send({ "isAdmin": user.isAdmin, "role": user.role });
+      } else {
+        res.send({ isAdmin: false, role: null })
       }
     })
 
@@ -121,7 +121,13 @@ async function run() {
           else {
             const update = { $addToSet: { classesId: body.classId } };
             const result = await usersCollection.updateOne(filter, update, options);
-            return res.send(result);
+            const classFilter = { _id: new ObjectId(body?.classId) };
+            const classAfterFilter = await classesCollection.findOne(classFilter);
+            const updateAvailableSeat = (+classAfterFilter?.availableSeat || +classAfterFilter?.capacity) - 1; //for converting integer and increasing value
+            const classUpdate = { $set: { availableSeat: updateAvailableSeat } }; // for reconvert in string formate
+            const classResult = await classesCollection.updateOne(classFilter, classUpdate);
+
+            return res.send({ userResult: result, classResult });
           }
         }
         if (body?.classes) {
