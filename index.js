@@ -123,10 +123,8 @@ async function run() {
           }
         }
         if (body?.classes) {
-          console.log("hitting");
           const update = { $push: { classes: body.classes } };
           const result = await usersCollection.updateOne(filter, update, options);
-          console.log(result);
           return res.send(result);
         }
         const updateUser = {
@@ -140,6 +138,22 @@ async function run() {
 
       }
     });
+
+    // Update class data 
+    app.put("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      console.log(req.body, id);
+      const query = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedClass = {
+        $set: {
+          ...body
+        }
+      }
+      const result = await classesCollection.updateOne(query, updatedClass, options);
+      res.send(result)
+    })
 
     //Delete my class
     app.delete("/users", async (req, res) => {
