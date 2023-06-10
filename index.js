@@ -52,7 +52,7 @@ async function run() {
           return res.status(404).send({ error: "User not found" });
         }
       }
-    
+
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
@@ -64,6 +64,9 @@ async function run() {
     })
 
     app.get("/classes", async (req, res) => {
+      if (req?.query?.email) {
+
+      }
       const result = await classesCollection.find().toArray();
       res.send(result);
     })
@@ -96,27 +99,33 @@ async function run() {
     })
 
 
-    
+
     // Update operation 
     app.put("/users", async (req, res) => {
       let query = {};
       if (req?.query?.email) {
         query = req.query.email;
         const body = req.body;
-        console.log(query);
+        // console.log(query);
         console.log(body);
         const filter = { email: query };
         const options = { upsert: true };
-        if (body?.status && body?.classId) {
-          const user = await usersCollection.findOne(filter);
+        const user = await usersCollection.findOne(filter);
+        if (body?.classId) {
           if (user?.classesId && user?.classesId?.includes(body.classId)) {
             // ClassId already exists in the array
             return res.send({ error: "ClassId already exists in the array." });
-          } else {
+          }
+          else {
             const update = { $addToSet: { classesId: body.classId } };
             const result = await usersCollection.updateOne(filter, update, options);
             return res.send(result);
           }
+        }
+        if (body?.classes) {
+          const update = { $addToSet: { classes: body.classes } };
+          const result = await usersCollection.updateOne(filter, update, options);
+          return res.send(result);
         }
         const updateUser = {
           $set: {
@@ -135,12 +144,12 @@ async function run() {
       if (req?.query?.email && req?.query?.id) {
         const query = { email: req.query?.email };
         const id = req.query.id;
-        console.log(req.query.email, id);
+        // console.log(req.query.email, id);
         const user = await usersCollection.findOne(query);
         if (user?.classesId) {
           const classIdToDelete = id;
           // setting updated classId by filter 
-          const updatedClassesId = user.classesId.filter(classId => classId !== classIdToDelete); 
+          const updatedClassesId = user.classesId.filter(classId => classId !== classIdToDelete);
           const updatedUser = {
             $set: {
               classesId: updatedClassesId
@@ -152,7 +161,7 @@ async function run() {
       }
     })
 
-    
+
     // delete users operations 
     app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
