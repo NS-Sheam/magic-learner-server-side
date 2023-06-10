@@ -37,12 +37,22 @@ async function run() {
 
     app.get("/users", async (req, res) => {
       if (req?.query?.email) {
-        const query = { email: req.query.email };
+        const query = { email: req.query?.email };
         const user = await usersCollection.findOne(query);
-        const classIds = user?.classesId.map(id => new ObjectId(id)); // Convert string IDs to ObjectId
-        const classesData = await classesCollection.find({ _id: { $in: classIds } }).toArray();
-        res.send(classesData);
+        if (user?.classesId) {
+          const classIds = user.classesId?.map(id => new ObjectId(id)); // Convert string IDs to ObjectId
+          const classesData = await classesCollection.find({ _id: { $in: classIds } }).toArray();
+          return res.send(classesData);
+        }
+        else if (!user?.classesId) {
+          return res.send({ error: "No classes found" });
+        } else {
+          // TODO: Enroll page server crashed after reloading
+          // Handle the scenario where the user with the provided email is not found
+          return res.status(404).send({ error: "User not found" });
+        }
       }
+    
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
@@ -86,7 +96,7 @@ async function run() {
     })
 
 
-    // app.put()
+    
     // Update operation 
     app.put("/users", async (req, res) => {
       let query = {};
@@ -97,9 +107,9 @@ async function run() {
         console.log(body);
         const filter = { email: query };
         const options = { upsert: true };
-        if (body.status && body.classId) {
+        if (body?.status && body?.classId) {
           const user = await usersCollection.findOne(filter);
-          if (user?.classesId && user.classesId.includes(body.classId)) {
+          if (user?.classesId && user?.classesId?.includes(body.classId)) {
             // ClassId already exists in the array
             return res.send({ error: "ClassId already exists in the array." });
           } else {
@@ -120,8 +130,30 @@ async function run() {
       }
     });
 
+    //Delete my class
+    app.delete("/users", async (req, res) => {
+      if (req?.query?.email && req?.query?.id) {
+        const query = { email: req.query?.email };
+        const id = req.query.id;
+        console.log(req.query.email, id);
+        const user = await usersCollection.findOne(query);
+        if (user?.classesId) {
+          const classIdToDelete = id;
+          // setting updated classId by filter 
+          const updatedClassesId = user.classesId.filter(classId => classId !== classIdToDelete); 
+          const updatedUser = {
+            $set: {
+              classesId: updatedClassesId
+            }
+          }
+          const result = await usersCollection.updateOne(query, updatedUser);
+          res.send(result);
+        }
+      }
+    })
 
-    // delete operations 
+    
+    // delete users operations 
     app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
