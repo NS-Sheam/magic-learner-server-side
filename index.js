@@ -123,8 +123,10 @@ async function run() {
           }
         }
         if (body?.classes) {
-          const update = { $addToSet: { classes: body.classes } };
+          console.log("hitting");
+          const update = { $push: { classes: body.classes } };
           const result = await usersCollection.updateOne(filter, update, options);
+          console.log(result);
           return res.send(result);
         }
         const updateUser = {
