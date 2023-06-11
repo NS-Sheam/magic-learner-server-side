@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const instructorData = require('./instructorData.json');
@@ -46,7 +47,7 @@ async function run() {
         }
         else if (!user?.classesId) {
           return res.send({ error: "No classes found" });
-        } 
+        }
         else {
           return res.status(404).send({ error: "User not found" });
         }
@@ -99,10 +100,10 @@ async function run() {
       console.log(query, user);
       if (!user) {
         const result = await usersCollection.insertOne(body);
-       return res.send(result);
-      } 
-      else{
-        return res.send({message: "user exist"})
+        return res.send(result);
+      }
+      else {
+        return res.send({ message: "user exist" })
       }
     })
 
@@ -115,6 +116,21 @@ async function run() {
       res.send(result);
     })
 
+
+    // Card payment intent 
+    app.post("/create-payment-intent", async (req, res)=>{
+      const {price} = req.body;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"]
+      })
+      res.send({
+        clientSecret: paymentIntent.client_secret
+      })
+
+    })
 
 
     // Update operation 
