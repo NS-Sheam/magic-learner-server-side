@@ -34,6 +34,7 @@ async function run() {
 
     const usersCollection = client.db("summerCampDb").collection("users");
     const classesCollection = client.db("summerCampDb").collection("classesData");
+    const paymentCollection = client.db("summerCampDb").collection("paymentData");
 
 
     app.get("/users", async (req, res) => {
@@ -118,8 +119,8 @@ async function run() {
 
 
     // Card payment intent 
-    app.post("/create-payment-intent", async (req, res)=>{
-      const {price} = req.body;
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
       const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
@@ -130,6 +131,16 @@ async function run() {
         clientSecret: paymentIntent.client_secret
       })
 
+    })
+
+
+    // Payment api
+    app.post("/payments", async (req, res) => {
+      const payment = req.body;
+      const result = await paymentCollection.insertOne(payment);
+      const query = { _id: { $in: payment.classIds.map(id => new ObjectId(id)) } };
+
+      res.send(result);
     })
 
 
@@ -152,13 +163,8 @@ async function run() {
           else {
             const update = { $addToSet: { classesId: body.classId } };
             const result = await usersCollection.updateOne(filter, update, options);
-            const classFilter = { _id: new ObjectId(body?.classId) };
-            const classAfterFilter = await classesCollection.findOne(classFilter);
-            const updateAvailableSeat = (+classAfterFilter?.availableSeat || +classAfterFilter?.capacity) - 1; //for converting integer and increasing value
-            const classUpdate = { $set: { availableSeat: updateAvailableSeat } }; // for reconvert in string formate
-            const classResult = await classesCollection.updateOne(classFilter, classUpdate);
 
-            return res.send({ userResult: result, classResult });
+            return res.send(result);
           }
         }
         if (body?.classes) {
