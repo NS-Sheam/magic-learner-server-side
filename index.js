@@ -71,6 +71,7 @@ async function run() {
 
 
     app.get('/users/admin/:email', async (req, res) => {
+      // console.log(req.params);
       if (req.params?.email) {
         const email = req.params?.email;
         // console.log(email);
@@ -78,10 +79,15 @@ async function run() {
         const user = await usersCollection.findOne(query);
         // const result = { isAdmin: user?.role === "admin" }
         // console.log(user);
-        res.send({ "isAdmin": user.isAdmin, "role": user.role });
-      } else {
-        res.send({ isAdmin: false, role: null })
-      }
+        if (!user) {
+          return res.send({ isAdmin: false, role: "student" })
+        }
+        return res.send({ "isAdmin": user.isAdmin, "role": user.role });
+      } 
+      if (!req.params?.email) {
+        return res.send({ isAdmin: false, role: null })
+        
+      } 
     })
 
 
@@ -109,7 +115,7 @@ async function run() {
         query = req.query.email;
         const body = req.body;
         // console.log(query);
-        console.log(body);
+        // console.log(body);
         const filter = { email: query };
         const options = { upsert: true };
         const user = await usersCollection.findOne(filter);
@@ -151,7 +157,8 @@ async function run() {
     app.put("/classes/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
-      console.log(req.body, id);
+      console.log("hitting");
+      // console.log(req.body, id);
       const query = { _id: new ObjectId(id) }
       const options = { upsert: true };
       const updatedClass = {
