@@ -46,7 +46,8 @@ async function run() {
         }
         else if (!user?.classesId) {
           return res.send({ error: "No classes found" });
-        } else {
+        } 
+        else {
           return res.status(404).send({ error: "User not found" });
         }
       }
@@ -83,18 +84,26 @@ async function run() {
           return res.send({ isAdmin: false, role: "student" })
         }
         return res.send({ "isAdmin": user.isAdmin, "role": user.role });
-      } 
+      }
       if (!req.params?.email) {
         return res.send({ isAdmin: false, role: null })
-        
-      } 
+
+      }
     })
 
 
     app.post("/users", async (req, res) => {
       const body = req.body;
-      const result = await usersCollection.insertOne(body);
-      res.send(result);
+      const query = { email: body.email }
+      const user = usersCollection.findOne(query);
+      console.log(query, user);
+      if (!user) {
+        const result = await usersCollection.insertOne(body);
+       return res.send(result);
+      } 
+      else{
+        return res.send({message: "user exist"})
+      }
     })
 
 
