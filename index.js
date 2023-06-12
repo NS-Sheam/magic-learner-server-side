@@ -82,15 +82,17 @@ async function run() {
         // console.log(email);
         const query = { email: email }
         const user = await usersCollection.findOne(query);
+        console.log(user);
         // const result = { isAdmin: user?.role === "admin" }
         // console.log(user);
         if (!user) {
-          return res.send({ isAdmin: false, role: "student" })
+          const result = await usersCollection.insertOne({email: email, isAdmin: false, role: "student"})
+          return res.send(result)
         }
         return res.send({ "isAdmin": user.isAdmin, "role": user.role });
       }
       if (!req.params?.email) {
-        return res.send({ isAdmin: false, role: null })
+        return res.send({ isAdmin: false, role: "student" })
 
       }
     })
@@ -99,7 +101,7 @@ async function run() {
     app.post("/users", async (req, res) => {
       const body = req.body;
       const query = { email: body.email }
-      const user = usersCollection.findOne(query);
+      const user = await usersCollection.findOne(query);
       console.log(query, user);
       if (!user) {
         const result = await usersCollection.insertOne(body);
