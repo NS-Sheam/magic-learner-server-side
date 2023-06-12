@@ -41,10 +41,11 @@ async function run() {
       if (req?.query?.email) {
         const query = { email: req.query?.email };
         const user = await usersCollection.findOne(query);
+        // console.log(user);
         if (user?.classesId) {
-          const classIds = user.classesId?.map(id => new ObjectId(id)); // Convert string IDs to ObjectId
+          const classIds = user.classesId?.map(idData => new ObjectId(Object.keys(idData)[0])); // Convert string IDs to ObjectId
           const classesData = await classesCollection.find({ _id: { $in: classIds } }).toArray();
-          return res.send(classesData);
+          return res.send(classesData)
         }
         else if (!user?.classesId) {
           return res.send({ error: "No classes found" });
@@ -121,7 +122,7 @@ async function run() {
     // Card payment intent 
     app.post("/create-payment-intent", async (req, res) => {
       const { price } = req.body;
-      const amount = price * 100;
+      const amount = Math.round(price * 100);;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: "usd",
@@ -137,10 +138,34 @@ async function run() {
     // Payment api
     app.post("/payments", async (req, res) => {
       const payment = req.body;
+      const email = req?.body?.email;
+      const user = await usersCollection.findOne({ email: email })
+      let isSuccess = true;
+      // console.log(user);
+      const classIds = req?.body?.classIds;
+      const options = { upsert: true };
+      classIds?.map(async (classId) => {
+        // console.log(classId, user, email);
+        const updateKey = {classId: "paymentConfirm"}
+        console.log(updateKey);
+        const updateUser = { $set: { classesId: { [`${classId}`] : "paymentConfirmed" } } };
+        const singleClass = await classesCollection.findOne({ _id: new ObjectId(classId) });
+        const updatedSingleClass = (+singleClass?.availableSeat || +singleClass?.capacity) - 1;
+        const classUpdate = { $set: { availableSeat: updatedSingleClass } };
+        const classResult = await classesCollection.updateOne({ _id: new ObjectId(classId) }, classUpdate);
+        const userResult = await usersCollection.updateOne(user, updateUser);
+        console.log( classResult, userResult);
+        if (classResult.modifiedCount === 0 || userResult.modifiedCount === 0) {
+          isSuccess = false;
+        }
+      });
       const result = await paymentCollection.insertOne(payment);
-      const query = { _id: { $in: payment.classIds.map(id => new ObjectId(id)) } };
-
-      res.send(result);
+      if (isSuccess) {
+        res.send({ paymentResult: result, success: true });
+      }
+      else {
+        res.send({ paymentResult: result, success: false });
+      }
     })
 
 
@@ -161,7 +186,7 @@ async function run() {
             return res.send({ error: "ClassId already exists in the array." });
           }
           else {
-            const update = { $addToSet: { classesId: body.classId } };
+            const update = { $addToSet: { classesId: { [body.classId]: "pending" } } };
             const result = await usersCollection.updateOne(filter, update, options);
 
             return res.send(result);
@@ -205,20 +230,23 @@ async function run() {
     app.delete("/users", async (req, res) => {
       if (req?.query?.email && req?.query?.id) {
         const query = { email: req.query?.email };
-        const id = req.query.id;
+        const id = req?.query?.id;
         // console.log(req.query.email, id);
         const user = await usersCollection.findOne(query);
         if (user?.classesId) {
-          const classIdToDelete = id;
-          // setting updated classId by filter 
-          const updatedClassesId = user.classesId.filter(classId => classId !== classIdToDelete);
+          const updatedClassesId = user?.classesId.filter((singleClass) => {
+            const classId = Object.keys(singleClass)[0];
+            return classId !== id;
+          });
+
           const updatedUser = {
             $set: {
-              classesId: updatedClassesId
-            }
-          }
+              classesId: updatedClassesId,
+            },
+          };
+
           const result = await usersCollection.updateOne(query, updatedUser);
-          res.send(result);
+          res.send(result)
         }
       }
     })
