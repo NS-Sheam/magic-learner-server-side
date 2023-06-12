@@ -44,8 +44,9 @@ async function run() {
         // console.log(user);
         if (user?.classesId) {
           const classIds = user.classesId?.map(idData => new ObjectId(Object.keys(idData)[0])); // Convert string IDs to ObjectId
+          const classesId = user.classesId;
           const classesData = await classesCollection.find({ _id: { $in: classIds } }).toArray();
-          return res.send(classesData)
+          return res.send({classesData, classesId })
         }
         else if (!user?.classesId) {
           return res.send({ error: "No classes found" });
@@ -144,21 +145,24 @@ async function run() {
       // console.log(user);
       const classIds = req?.body?.classIds;
       const options = { upsert: true };
+      const updateKey = []
       classIds?.map(async (classId) => {
         // console.log(classId, user, email);
-        const updateKey = {classId: "paymentConfirm"}
-        console.log(updateKey);
-        const updateUser = { $set: { classesId: { [`${classId}`] : "paymentConfirmed" } } };
+        updateKey.push({ [classId]: "paymentConfirm" })
         const singleClass = await classesCollection.findOne({ _id: new ObjectId(classId) });
         const updatedSingleClass = (+singleClass?.availableSeat || +singleClass?.capacity) - 1;
         const classUpdate = { $set: { availableSeat: updatedSingleClass } };
         const classResult = await classesCollection.updateOne({ _id: new ObjectId(classId) }, classUpdate);
-        const userResult = await usersCollection.updateOne(user, updateUser);
-        console.log( classResult, userResult);
-        if (classResult.modifiedCount === 0 || userResult.modifiedCount === 0) {
+        // console.log(classResult);
+        if (classResult.modifiedCount === 0) {
           isSuccess = false;
         }
       });
+      const updateUser = { $set: { classesId: updateKey } };
+      const userResult = await usersCollection.updateOne(user, updateUser);
+      if (userResult.modifiedCount === 0) {
+        isSuccess = false;
+      }
       const result = await paymentCollection.insertOne(payment);
       if (isSuccess) {
         res.send({ paymentResult: result, success: true });
