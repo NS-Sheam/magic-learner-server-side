@@ -102,7 +102,7 @@ async function run() {
       const body = req.body;
       const query = { email: body.email }
       const user = await usersCollection.findOne(query);
-      console.log(query, user);
+      // console.log(query, user);
       if (!user) {
         const result = await usersCollection.insertOne(body);
         return res.send(result);
